@@ -56,16 +56,15 @@ jobs:
         coverage report --fail-under=80
         coverage xml
     - name: Upload coverage to Codecov
-      working-directory: uniticket/
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
+        file: uniticket/coverage.xml
         flags: unittests
         env_vars: OS,PYTHON
         name: codecov-umbrella
         fail_ci_if_error: true
-        path_to_write_report: ./codecov_report.txt
+        path_to_write_report: uniticket/codecov_report.txt
         # verbose: true    
     - name: Bandit Security Scan
       working-directory: uniticket/
