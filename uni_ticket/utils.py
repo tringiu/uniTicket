@@ -31,6 +31,7 @@ from organizational_area.models import (
     OrganizationalStructureOfficeEmployee,
     UserManageOrganizationalStructure,
 )
+from uni_ticket.settings import EMPLOYEE_ATTRIBUTE_LABEL, EMPLOYEE_ATTRIBUTE_NAME, MSG_FOOTER, MSG_HEADER, SUMMARY_EMPLOYEE_EMAIL, SUPER_USER_VIEW_ALL, USER_ATTRIBUTE_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ def user_manage_something(user):
     """
     if not user:
         return False
-    if settings.SUPER_USER_VIEW_ALL and user.is_superuser:
+    if SUPER_USER_VIEW_ALL and user.is_superuser:
         structures = OrganizationalStructure.objects.filter(is_active=True)
     else:
         osoe = OrganizationalStructureOfficeEmployee
@@ -86,7 +87,7 @@ def user_is_manager(user, structure):
     """
     Returns True if user is a manager for the structure
     """
-    if settings.SUPER_USER_VIEW_ALL and user.is_superuser:
+    if SUPER_USER_VIEW_ALL and user.is_superuser:
         return True
     umos = UserManageOrganizationalStructure
     user_structure_manager = umos.objects.filter(
@@ -105,7 +106,7 @@ def user_is_in_default_office(user, structure):
     """
     if not user or not structure:
         return False
-    if settings.SUPER_USER_VIEW_ALL and user.is_superuser:
+    if SUPER_USER_VIEW_ALL and user.is_superuser:
         return True
     osoe = OrganizationalStructureOfficeEmployee
     help_desk_assigned = osoe.objects.filter(
@@ -387,7 +388,7 @@ def send_summary_email(users=[]):
         sent = send_custom_mail(
             subject=m_subject,
             recipients=[user],
-            body=settings.SUMMARY_EMPLOYEE_EMAIL,
+            body=SUMMARY_EMPLOYEE_EMAIL,
             params=d,
         )
         if not sent:
@@ -423,7 +424,7 @@ def send_custom_mail(subject, recipients, body, params={}, force=False):
         recipients_list.append(recipient.email)
 
     if recipients_list:
-        msg_body_list = [settings.MSG_HEADER, body, settings.MSG_FOOTER]
+        msg_body_list = [MSG_HEADER, body, MSG_FOOTER]
         msg_body = "".join([i.__str__()
                             for i in msg_body_list]).format(**params)
         result = send_mail(
@@ -459,8 +460,8 @@ def user_is_in_organization(user):
     """ """
     if not user:
         return False
-    if getattr(settings, "USER_ATTRIBUTE_NAME", False):
-        attr = getattr(user, settings.USER_ATTRIBUTE_NAME)
+    attr = getattr(user, USER_ATTRIBUTE_NAME, False)
+    if attr:
         if callable(attr):
             return attr()
         else:
@@ -515,13 +516,13 @@ def export_input_module_csv(
     if hasattr(settings, "EMPLOYEE_ATTRIBUTE_NAME"):
         head.append(
             getattr(
-                settings, "EMPLOYEE_ATTRIBUTE_LABEL", settings.EMPLOYEE_ATTRIBUTE_NAME
+                settings, "EMPLOYEE_ATTRIBUTE_LABEL", EMPLOYEE_ATTRIBUTE_LABEL
             )
         )
     if hasattr(settings, "USER_ATTRIBUTE_NAME"):
         head.append(
             getattr(settings, "USER_ATTRIBUTE_LABEL",
-                    settings.USER_ATTRIBUTE_NAME)
+                    USER_ATTRIBUTE_NAME)
         )
     head.extend(["status", "subject", "description"])
     custom_head = []
@@ -574,10 +575,10 @@ def export_input_module_csv(
         ]
         if hasattr(settings, "EMPLOYEE_ATTRIBUTE_NAME"):
             row.append(getattr(richiesta.created_by,
-                               settings.EMPLOYEE_ATTRIBUTE_NAME))
+                               EMPLOYEE_ATTRIBUTE_NAME))
         if hasattr(settings, "USER_ATTRIBUTE_NAME"):
             row.append(getattr(richiesta.created_by,
-                               settings.USER_ATTRIBUTE_NAME))
+                               USER_ATTRIBUTE_NAME))
         row.extend([status, richiesta.subject, richiesta.description])
 
         for column in custom_head:

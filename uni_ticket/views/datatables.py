@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datatables_ajax.datatables import DjangoDatatablesServerProc
 from uni_ticket.decorators import is_manager, is_operator
 from uni_ticket.models import Ticket, TicketAssignment
+from uni_ticket.settings import SIMPLE_USER_SHOW_PRIORITY
 from uni_ticket.utils import get_datetime_delta, visible_tickets_to_user
 
 
@@ -85,7 +86,7 @@ def user_all_tickets(request):
     :return: JsonResponse
     """
     columns = _no_priority
-    if settings.SIMPLE_USER_SHOW_PRIORITY:
+    if SIMPLE_USER_SHOW_PRIORITY:
         columns = _ticket_columns
     ticket_list = Ticket.objects.filter(
         Q(created_by=request.user) | Q(compiled_by=request.user)
@@ -103,7 +104,7 @@ def user_unassigned_ticket(request):
     :return: JsonResponse
     """
     columns = _no_priority
-    if settings.SIMPLE_USER_SHOW_PRIORITY:
+    if SIMPLE_USER_SHOW_PRIORITY:
         columns = _ticket_columns
     ticket_list = Ticket.objects.filter(
         Q(created_by=request.user) | Q(compiled_by=request.user), is_closed=False
@@ -125,7 +126,7 @@ def user_opened_ticket(request):
     :return: JsonResponse
     """
     columns = _no_priority
-    if settings.SIMPLE_USER_SHOW_PRIORITY:
+    if SIMPLE_USER_SHOW_PRIORITY:
         columns = _ticket_columns
     ticket_list = Ticket.objects.filter(
         Q(created_by=request.user) | Q(compiled_by=request.user), is_closed=False
@@ -147,7 +148,7 @@ def user_closed_ticket(request):
     :return: JsonResponse
     """
     columns = _no_priority
-    if settings.SIMPLE_USER_SHOW_PRIORITY:
+    if SIMPLE_USER_SHOW_PRIORITY:
         columns = _ticket_columns
     ticket_list = Ticket.objects.filter(
         Q(created_by=request.user) | Q(compiled_by=request.user), is_closed=True

@@ -24,7 +24,7 @@ from uni_ticket.decorators import (
 )
 from uni_ticket.forms import *
 from uni_ticket.models import *
-from uni_ticket.settings import SIMPLE_USER_SHOW_PRIORITY
+from uni_ticket.settings import NEW_TICKET_ASSIGNED_TO_OPERATOR_BODY, READONLY_COMPETENCE_OVER_TICKET, SIMPLE_USER_SHOW_PRIORITY, USER_TICKET_MESSAGE
 from uni_ticket.utils import *
 
 
@@ -221,7 +221,7 @@ def ticket_detail(
     if request.method == "POST":
         if can_manage["readonly"]:
             messages.add_message(
-                request, messages.ERROR, settings.READONLY_COMPETENCE_OVER_TICKET
+                request, messages.ERROR, READONLY_COMPETENCE_OVER_TICKET
             )
             return redirect(
                 "uni_ticket:manage_ticket_url_detail",
@@ -266,7 +266,7 @@ def ticket_detail(
                     "Priorità assegnata: {}".format(
                         request.user, priority_text)
                 )
-                if not settings.SIMPLE_USER_SHOW_PRIORITY:
+                if not SIMPLE_USER_SHOW_PRIORITY:
                     msg = _("Ticket preso in carico da {}.".format(request.user))
                 ticket.update_log(user=request.user, note=msg)
                 messages.add_message(
@@ -342,7 +342,7 @@ def ticket_detail(
                 send_custom_mail(
                     subject=m_subject,
                     recipients=[operator],
-                    body=settings.NEW_TICKET_ASSIGNED_TO_OPERATOR_BODY,
+                    body=NEW_TICKET_ASSIGNED_TO_OPERATOR_BODY,
                     params=mail_params,
                 )
 
@@ -368,7 +368,7 @@ def ticket_detail(
             }
 
             msg = _("Priorità aggiornata")
-            if settings.SIMPLE_USER_SHOW_PRIORITY:
+            if SIMPLE_USER_SHOW_PRIORITY:
                 msg = _("Priorità assegnata: {}".format(priority_text))
 
             ticket.update_log(user=request.user, note=msg)
@@ -1017,7 +1017,7 @@ def ticket_competence_add_new(
     """
     if can_manage["readonly"]:
         messages.add_message(
-            request, messages.ERROR, settings.READONLY_COMPETENCE_OVER_TICKET
+            request, messages.ERROR, READONLY_COMPETENCE_OVER_TICKET
         )
         return redirect(
             "uni_ticket:manage_ticket_url_detail",
@@ -1329,7 +1329,7 @@ def ticket_message(
     if request.method == "POST":
         if can_manage["readonly"]:
             messages.add_message(
-                request, messages.ERROR, settings.READONLY_COMPETENCE_OVER_TICKET
+                request, messages.ERROR, READONLY_COMPETENCE_OVER_TICKET
             )
             return redirect(
                 "uni_ticket:manage_ticket_url_detail",
@@ -1392,7 +1392,7 @@ def ticket_message(
             send_custom_mail(
                 subject=m_subject,
                 recipients=ticket.get_owners(),
-                body=settings.USER_TICKET_MESSAGE,
+                body=USER_TICKET_MESSAGE,
                 params=mail_params,
             )
             # END Send mail to ticket owner
@@ -1662,7 +1662,7 @@ def task_detail(
             )
 
             messages.add_message(
-                request, messages.ERROR, settings.READONLY_COMPETENCE_OVER_TICKET
+                request, messages.ERROR, READONLY_COMPETENCE_OVER_TICKET
             )
             return redirect(
                 "uni_ticket:manage_ticket_url_detail",

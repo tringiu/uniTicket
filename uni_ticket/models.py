@@ -1,6 +1,9 @@
+import logging
 import json
 import os
+import sys
 
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.contenttypes.models import ContentType
@@ -32,6 +35,9 @@ from uni_ticket.settings import (
 from .dynamic_form import DynamicForm
 from .utils import *
 from .validators import *
+from . settings import CATEGORY_CONDITIONS_ATTACHMENT_SUBFOLDER, MAX_DAILY_TICKET_PER_USER, STRUCTURES_FOLDER, TICKET_ATTACHMENT_FOLDER, TICKET_CATEGORIES_FOLDER, TICKET_DESCRIPTION_ID, TICKET_MIN_DIGITS_TO_COMPRESS, TICKET_SUBJECT_ID, TICKET_TASK_ATTACHMENT_SUBFOLDER, TICKET_UPDATED, TITOLARIO_DICT, UO_DICT
+
+logger = logging.getLogger('__name__')
 
 
 def _attachment_upload(instance, filename):
@@ -139,7 +145,7 @@ class TicketCategory(ExpirableModel, TimeStampedModel):
 
     # allowed users
     allowed_users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, blank=True)
+        get_user_model(), blank=True)
 
     # ticket type = notification
     is_notification = models.BooleanField(
@@ -231,9 +237,9 @@ class TicketCategory(ExpirableModel, TimeStampedModel):
         Returns ticket attachments folder path
         """
         folder = "{}/{}/{}/{}".format(
-            settings.STRUCTURES_FOLDER,
+            STRUCTURES_FOLDER,
             self.organizational_structure.slug,
-            settings.TICKET_CATEGORIES_FOLDER,
+            TICKET_CATEGORIES_FOLDER,
             self.slug,
         )
         return folder
@@ -397,14 +403,14 @@ class Ticket(SavedFormContent):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
         related_name="created_by_user",
     )
     compiled = models.DateTimeField(null=True, blank=True)
     compiled_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -415,7 +421,7 @@ class Ticket(SavedFormContent):
     is_closed = models.BooleanField(default=False)
     closed_date = models.DateTimeField(blank=True, null=True)
     closed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -456,7 +462,7 @@ class Ticket(SavedFormContent):
         Returns ticket attachments folder path
         """
         folder = "{}/{}/{}".format(
-            settings.TICKET_ATTACHMENT_FOLDER, self.get_year(), self.code
+            TICKET_ATTACHMENT_FOLDER, self.get_year(), self.code
         )
         return folder
 
@@ -464,7 +470,7 @@ class Ticket(SavedFormContent):
         # if check on length is abled and length is short
         if (
             check_length
-            and not len(self.modulo_compilato) > settings.TICKET_MIN_DIGITS_TO_COMPRESS
+            and not len(self.modulo_compilato) > TICKET_MIN_DIGITS_TO_COMPRESS
         ):
             return
         self.modulo_compilato = compress_text_to_b64(
@@ -502,10 +508,10 @@ class Ticket(SavedFormContent):
     @staticmethod
     def number_limit_reached_by_user(user):
         """ """
-        if settings.MAX_DAILY_TICKET_PER_USER == 0:
+        if MAX_DAILY_TICKET_PER_USER == 0:
             return False
         today_tickets = Ticket.get_user_ticket_per_day(user=user).count()
-        if today_tickets < settings.MAX_DAILY_TICKET_PER_USER:
+        if today_tickets < MAX_DAILY_TICKET_PER_USER:
             return False
         return True
 
@@ -584,8 +590,8 @@ class Ticket(SavedFormContent):
         if not modulo:
             return None
         extra_datas = {}
-        extra_datas[settings.TICKET_SUBJECT_ID] = self.subject
-        extra_datas[settings.TICKET_DESCRIPTION_ID] = self.description
+        extra_datas[TICKET_SUBJECT_ID] = self.subject
+        extra_datas[TICKET_DESCRIPTION_ID] = self.description
         form = SavedFormContent.compiled_form(
             data_source=json.dumps(self.get_modulo_compilato()),
             extra_datas=extra_datas,
@@ -602,8 +608,8 @@ class Ticket(SavedFormContent):
         set_as_dict(
             self,
             ticket_dict,
-            fields_to_pop=[settings.TICKET_SUBJECT_ID,
-                           settings.TICKET_DESCRIPTION_ID],
+            fields_to_pop=[TICKET_SUBJECT_ID,
+                           TICKET_DESCRIPTION_ID],
         )
 
     # HTML representation of status
@@ -694,7 +700,7 @@ class Ticket(SavedFormContent):
             send_custom_mail(
                 subject=m_subject,
                 recipients=self.get_owners(),
-                body=settings.TICKET_UPDATED,
+                body=TICKET_UPDATED,
                 params=d,
             )
             # End send mail to ticket owner
@@ -875,7 +881,7 @@ class Ticket(SavedFormContent):
 
     def get_priority(self):
         """ """
-        # return dict(settings.PRIORITY_LEVELS).get(str(self.priority))
+        # return dict(PRIORITY_LEVELS).get(str(self.priority))
         return dict(PRIORITY_LEVELS).get(self.priority)
 
     def get_messages_count(self, by_operator=False):
@@ -1050,11 +1056,11 @@ class TicketAssignment(TimeStampedModel):
         OrganizationalStructureOffice, on_delete=models.PROTECT)
     note = models.TextField(blank=True, null=True)
     assigned_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True
+        get_user_model(), on_delete=models.PROTECT, null=True
     )
     taken_date = models.DateTimeField(null=True, blank=True)
     taken_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -1122,7 +1128,7 @@ class TicketReply(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
     read_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -1203,7 +1209,7 @@ class AbstractTask(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+        get_user_model(), on_delete=models.SET_NULL, null=True
     )
     # priority = models.IntegerField(default=0)
     priority = models.IntegerField(choices=PRIORITY_LEVELS, default=0)
@@ -1265,7 +1271,7 @@ class Task(AbstractTask):
         """
         ticket_folder = self.ticket.get_folder()
         folder = "{}/{}/{}".format(
-            ticket_folder, settings.TICKET_TASK_ATTACHMENT_SUBFOLDER, self.code
+            ticket_folder, TICKET_TASK_ATTACHMENT_SUBFOLDER, self.code
         )
         return folder
 
@@ -1346,7 +1352,7 @@ class TicketCategoryCondition(models.Model):
         """
         category_folder = self.category.get_folder()
         return "{}/{}".format(
-            category_folder, settings.CATEGORY_CONDITIONS_ATTACHMENT_SUBFOLDER
+            category_folder, CATEGORY_CONDITIONS_ATTACHMENT_SUBFOLDER
         )
 
     def __str__(self):
@@ -1373,7 +1379,7 @@ class TicketCategoryTask(AbstractTask):
         """
         category_folder = self.category.get_folder()
         folder = "{}/{}/{}".format(
-            category_folder, settings.TICKET_TASK_ATTACHMENT_SUBFOLDER, self.code
+            category_folder, TICKET_TASK_ATTACHMENT_SUBFOLDER, self.code
         )
         return folder
 
@@ -1399,7 +1405,7 @@ class TicketCategoryTask(AbstractTask):
 # max_length=12)
 # protocollo_cod_titolario = models.CharField(_('Codice titolario'),
 # max_length=12,
-# choices=settings.TITOLARIO_DICT)
+# choices=TITOLARIO_DICT)
 # protocollo_fascicolo_numero = models.CharField(_('Fascicolo numero'),
 # max_length=12)
 # default=settings.PROTOCOLLO_FASCICOLO_DEFAULT)
@@ -1462,7 +1468,7 @@ class TicketCategoryWSProtocollo(TimeStampedModel):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False)
     protocollo_uo = models.CharField(
-        "UO", max_length=12, choices=settings.UO_DICT)
+        "UO", max_length=12, choices=UO_DICT)
     protocollo_uo_rpa = models.CharField(
         "RPA", max_length=255, default="", blank=True, help_text=_("Nominativo RPA")
     )
@@ -1487,10 +1493,10 @@ class TicketCategoryWSProtocollo(TimeStampedModel):
         max_length=255,
         blank=True,
         null=True,
-        help_text="Se vuoto: {}".format(settings.PROTOCOL_EMAIL_DEFAULT),
+        help_text="default: settings.PROTOCOL_EMAIL_DEFAULT",
     )
     protocollo_cod_titolario = models.CharField(
-        _("Codice titolario"), max_length=12, choices=settings.TITOLARIO_DICT
+        _("Codice titolario"), max_length=12, choices=TITOLARIO_DICT
     )
     protocollo_fascicolo_numero = models.CharField(
         _("Fascicolo numero"), max_length=255, default="", blank=True

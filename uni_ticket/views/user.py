@@ -39,6 +39,7 @@ from uni_ticket.jwts import *
 from uni_ticket.models import *
 from uni_ticket.pdf_utils import response_as_pdf
 from uni_ticket.protocol_utils import ticket_protocol
+from uni_ticket.settings import NEW_TICKET_CREATED, NEW_TICKET_CREATED_EMPLOYEE_BODY, OPERATOR_PREFIX, TICKET_CAPTCHA_HIDDEN_ID, TICKET_CAPTCHA_ID, TICKET_COMPILED_BY_USER_NAME, TICKET_COMPILED_CREATION_DATE, TICKET_CONDITIONS_FIELD_ID, TICKET_CREATE_BUTTON_NAME, TICKET_DELETED, TICKET_GENERATE_URL_BUTTON_NAME, TICKET_INPUT_MODULE_NAME, UNAVAILABLE_TICKET_CATEGORY, USER_TICKET_MESSAGE
 from uni_ticket.utils import *
 
 
@@ -171,9 +172,9 @@ def _send_new_ticket_mail_to_operators(
     for op in operators:
         recipients.append(op.employee.email)
 
-    mail_params["user"] = settings.OPERATOR_PREFIX
-    msg_body_list = [settings.MSG_HEADER,
-                     message_template, settings.MSG_FOOTER]
+    mail_params["user"] = OPERATOR_PREFIX
+    msg_body_list = [MSG_HEADER,
+                     message_template, MSG_FOOTER]
     msg_body = "".join([i.__str__()
                         for i in msg_body_list]).format(**mail_params)
     result = send_mail(
@@ -209,7 +210,7 @@ def ticket_new_preload(request, structure_slug=None):
                 "Hai raggiunto il limite massimo giornaliero"
                 " di richieste: <b>{}</b>"
                 ""
-            ).format(settings.MAX_DAILY_TICKET_PER_USER),
+            ).format(MAX_DAILY_TICKET_PER_USER),
         )
         return redirect(reverse("uni_ticket:user_dashboard"))
 
@@ -315,7 +316,7 @@ def ticket_add_new(request, structure_slug, category_slug):
     # if category is not active, return an error message
     if not category.is_published():
         unavailable_msg = (
-            category.not_available_message or settings.UNAVAILABLE_TICKET_CATEGORY
+            category.not_available_message or UNAVAILABLE_TICKET_CATEGORY
         )
         return custom_message(request, unavailable_msg, status=404)
 
@@ -336,7 +337,7 @@ def ticket_add_new(request, structure_slug, category_slug):
                 _(
                     "Hai raggiunto il limite massimo giornaliero"
                     " di richieste: <b>{}</b>"
-                    "".format(settings.MAX_DAILY_TICKET_PER_USER)
+                    "".format(MAX_DAILY_TICKET_PER_USER)
                 ),
             )
             return redirect("uni_ticket:user_dashboard")
@@ -381,7 +382,7 @@ def ticket_add_new(request, structure_slug, category_slug):
         except Exception:
             return custom_message(request, _("Dati da importare non consistenti."))
         # get input_module id from imported data
-        module_id = imported_data.get(settings.TICKET_INPUT_MODULE_NAME)
+        module_id = imported_data.get(TICKET_INPUT_MODULE_NAME)
         if not module_id:
             return custom_message(
                 request,
@@ -392,16 +393,16 @@ def ticket_add_new(request, structure_slug, category_slug):
         )
         # get user that compiled module (if exists)
         compiled_by_user_id = imported_data.get(
-            settings.TICKET_COMPILED_BY_USER_NAME)
+            TICKET_COMPILED_BY_USER_NAME)
         if compiled_by_user_id:
             compiled_by_user = (
                 get_user_model().objects.filter(pk=compiled_by_user_id).first()
             )
             compiled_date = (
                 parse_datetime(
-                    imported_data.get(settings.TICKET_COMPILED_CREATION_DATE)
+                    imported_data.get(TICKET_COMPILED_CREATION_DATE)
                 )
-                if imported_data.get(settings.TICKET_COMPILED_CREATION_DATE)
+                if imported_data.get(TICKET_COMPILED_CREATION_DATE)
                 else timezone.localtime()
             )
         # get compiled form
@@ -439,15 +440,15 @@ def ticket_add_new(request, structure_slug, category_slug):
             # add static static fields to fields to pop
             # these fields are useful only in frontend
             fields_to_pop = [
-                settings.TICKET_CONDITIONS_FIELD_ID,
-                settings.TICKET_CAPTCHA_ID,
-                settings.TICKET_CAPTCHA_HIDDEN_ID,
+                TICKET_CONDITIONS_FIELD_ID,
+                TICKET_CAPTCHA_ID,
+                TICKET_CAPTCHA_HIDDEN_ID,
             ]
             #
             # if user generates an encrypted token in URL
             # no ticket is saved. compiled form is serialized
             #
-            if request.POST.get(settings.TICKET_GENERATE_URL_BUTTON_NAME):
+            if request.POST.get(TICKET_GENERATE_URL_BUTTON_NAME):
 
                 # log action
                 logger.info(
@@ -458,7 +459,7 @@ def ticket_add_new(request, structure_slug, category_slug):
                 )
 
                 # add the "generate url" button to fields to pop
-                fields_to_pop.append(settings.TICKET_GENERATE_URL_BUTTON_NAME)
+                fields_to_pop.append(TICKET_GENERATE_URL_BUTTON_NAME)
 
                 # get form data in json
                 json_data = get_POST_as_json(
@@ -468,15 +469,15 @@ def ticket_add_new(request, structure_slug, category_slug):
 
                 # insert input module pk to json data
                 form_data.update(
-                    {settings.TICKET_INPUT_MODULE_NAME: modulo.pk})
+                    {TICKET_INPUT_MODULE_NAME: modulo.pk})
 
-                if request.POST.get(settings.TICKET_COMPILED_BY_USER_NAME):
+                if request.POST.get(TICKET_COMPILED_BY_USER_NAME):
                     form_data.update(
-                        {settings.TICKET_COMPILED_BY_USER_NAME: request.user.pk}
+                        {TICKET_COMPILED_BY_USER_NAME: request.user.pk}
                     )
                     form_data.update(
                         {
-                            settings.TICKET_COMPILED_CREATION_DATE: timezone.localtime().isoformat()
+                             TICKET_COMPILED_CREATION_DATE: timezone.localtime().isoformat()
                         }
                     )
 
@@ -510,7 +511,7 @@ def ticket_add_new(request, structure_slug, category_slug):
             #
             # if user creates the ticket
             #
-            elif request.POST.get(settings.TICKET_CREATE_BUTTON_NAME):
+            elif request.POST.get(TICKET_CREATE_BUTTON_NAME):
 
                 # if user is not allowed (category allowed users list)
                 if (
@@ -530,11 +531,11 @@ def ticket_add_new(request, structure_slug, category_slug):
                 # extends fields_to_pop list
                 fields_to_pop.extend(
                     [
-                        settings.TICKET_SUBJECT_ID,
-                        settings.TICKET_DESCRIPTION_ID,
-                        settings.TICKET_CREATE_BUTTON_NAME,
-                        settings.TICKET_COMPILED_BY_USER_NAME,
-                        settings.TICKET_COMPILED_CREATION_DATE,
+                        TICKET_SUBJECT_ID,
+                        TICKET_DESCRIPTION_ID,
+                        TICKET_CREATE_BUTTON_NAME,
+                        TICKET_COMPILED_BY_USER_NAME,
+                        TICKET_COMPILED_CREATION_DATE,
                     ]
                 )
 
@@ -547,8 +548,8 @@ def ticket_add_new(request, structure_slug, category_slug):
                 code = uuid_code()
 
                 # get ticket subject and description
-                subject = form.cleaned_data[settings.TICKET_SUBJECT_ID]
-                description = form.cleaned_data[settings.TICKET_DESCRIPTION_ID]
+                subject = form.cleaned_data[TICKET_SUBJECT_ID]
+                description = form.cleaned_data[TICKET_DESCRIPTION_ID]
 
                 # destination office
                 office = category.organizational_office
@@ -641,7 +642,7 @@ def ticket_add_new(request, structure_slug, category_slug):
                 # send success message to user
                 ticket_message = (
                     ticket.input_module.ticket_category.confirm_message_text
-                    or settings.NEW_TICKET_CREATED_ALERT
+                    or NEW_TICKET_CREATED_ALERT
                 )
 
                 compiled_message = ticket_message.format(ticket.subject)
@@ -759,7 +760,7 @@ def ticket_add_new(request, structure_slug, category_slug):
                         request=request,
                         ticket=ticket,
                         category=category,
-                        message_template=settings.NEW_TICKET_CREATED_EMPLOYEE_BODY,
+                        message_template=NEW_TICKET_CREATED_EMPLOYEE_BODY,
                         mail_params=mail_params,
                     )
 
@@ -790,7 +791,7 @@ def ticket_add_new(request, structure_slug, category_slug):
                     send_custom_mail(
                         subject=m_subject,
                         recipients=ticket.get_owners(),
-                        body=settings.NEW_TICKET_CREATED,
+                        body=NEW_TICKET_CREATED,
                         params=mail_params,
                     )
                     # END Send mail to ticket owner
@@ -912,7 +913,7 @@ def ticket_edit(request, ticket_id):
         "title": title,
     }
     if request.method == "POST":
-        fields_to_pop = [settings.TICKET_CONDITIONS_FIELD_ID]
+        fields_to_pop = [TICKET_CONDITIONS_FIELD_ID]
         json_post = get_POST_as_json(
             request=request, fields_to_pop=fields_to_pop)
         json_response = json.loads(json_post)
@@ -942,8 +943,8 @@ def ticket_edit(request, ticket_id):
 
             # save module
             ticket.save_data(
-                form.cleaned_data[settings.TICKET_SUBJECT_ID],
-                form.cleaned_data[settings.TICKET_DESCRIPTION_ID],
+                form.cleaned_data[TICKET_SUBJECT_ID],
+                form.cleaned_data[TICKET_DESCRIPTION_ID],
                 json_response,
             )
 
@@ -1090,7 +1091,7 @@ def ticket_delete(request, ticket_id):
     send_custom_mail(
         subject=m_subject,
         recipients=ticket.get_owners(),
-        body=settings.TICKET_DELETED,
+        body=TICKET_DELETED,
         params=mail_params,
     )
     # END Send mail to ticket owner
@@ -1266,7 +1267,7 @@ def ticket_message(request, ticket_id):
             send_custom_mail(
                 subject=m_subject,
                 recipients=[request.user],
-                body=settings.USER_TICKET_MESSAGE,
+                body=USER_TICKET_MESSAGE,
                 params=mail_params,
             )
             # END Send mail to ticket owner
@@ -1571,9 +1572,9 @@ def ticket_clone(request, ticket_id):
     form_data = main_ticket.get_modulo_compilato()
 
     form_data.update(
-        {settings.TICKET_INPUT_MODULE_NAME: main_ticket.input_module.pk})
-    form_data.update({settings.TICKET_SUBJECT_ID: main_ticket.subject})
-    form_data.update({settings.TICKET_DESCRIPTION_ID: main_ticket.description})
+        {TICKET_INPUT_MODULE_NAME: main_ticket.input_module.pk})
+    form_data.update({TICKET_SUBJECT_ID: main_ticket.subject})
+    form_data.update({TICKET_DESCRIPTION_ID: main_ticket.description})
 
     # build encrypted url param with form data
     encrypted_data = encrypt_to_jwe(json.dumps(form_data).encode())

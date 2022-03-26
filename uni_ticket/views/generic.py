@@ -15,6 +15,7 @@ from organizational_area.models import OrganizationalStructure
 
 from uni_ticket.decorators import *
 from uni_ticket.models import *
+from uni_ticket.settings import USER_TICKET_MESSAGE
 from uni_ticket.utils import *
 
 
@@ -466,7 +467,7 @@ def ticket_message_delete(request, ticket_message_id):
         send_custom_mail(
             subject=m_subject,
             recipients=[request.user],
-            body=settings.USER_TICKET_MESSAGE,
+            body=USER_TICKET_MESSAGE,
             params=mail_params,
         )
         # END Send mail to ticket owner

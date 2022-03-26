@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django_form_builder.forms import BaseDynamicForm
 from django_form_builder import dynamic_fields
+from uni_ticket.settings import TICKET_CAPTCHA_HIDDEN_ID, TICKET_CAPTCHA_ID, TICKET_CAPTCHA_LABEL, TICKET_CONDITIONS_FIELD_ID, TICKET_CONDITIONS_TEXT, TICKET_DESCRIPTION_HELP_TEXT, TICKET_DESCRIPTION_ID, TICKET_DESCRIPTION_LABEL, TICKET_SUBJECT_HELP_TEXT, TICKET_SUBJECT_ID, TICKET_SUBJECT_LABEL
 
 
 class DynamicForm(BaseDynamicForm):
@@ -23,11 +24,11 @@ class DynamicForm(BaseDynamicForm):
         # and put it in initial fields
         if conditions and show_conditions:
             conditions_id = dynamic_fields.format_field_name(
-                settings.TICKET_CONDITIONS_FIELD_ID
+                TICKET_CONDITIONS_FIELD_ID
             )
             conditions_data = {
                 "required": True,
-                "label": settings.TICKET_CONDITIONS_TEXT,
+                "label": TICKET_CONDITIONS_TEXT,
             }
             conditions_field = getattr(dynamic_fields, "CheckBoxField")(
                 **conditions_data
@@ -37,11 +38,11 @@ class DynamicForm(BaseDynamicForm):
         # Generate SUBJECT TICKET field
         # and put it in initial fields
         subject_id = dynamic_fields.format_field_name(
-            settings.TICKET_SUBJECT_ID)
+            TICKET_SUBJECT_ID)
         subject_data = {
             "required": True,
-            "label": settings.TICKET_SUBJECT_LABEL,
-            "help_text": settings.TICKET_SUBJECT_HELP_TEXT,
+            "label": TICKET_SUBJECT_LABEL,
+            "help_text": TICKET_SUBJECT_HELP_TEXT,
             "initial": subject_initial,
         }
         subject_field = getattr(
@@ -51,12 +52,12 @@ class DynamicForm(BaseDynamicForm):
         # Generate DESCRIZIONE TICKET field
         # and put it in initial fields
         description_id = dynamic_fields.format_field_name(
-            settings.TICKET_DESCRIPTION_ID
+            TICKET_DESCRIPTION_ID
         )
         description_data = {
             "required": True,
-            "label": settings.TICKET_DESCRIPTION_LABEL,
-            "help_text": settings.TICKET_DESCRIPTION_HELP_TEXT,
+            "label": TICKET_DESCRIPTION_LABEL,
+            "help_text": TICKET_DESCRIPTION_HELP_TEXT,
             "initial": description_initial,
         }
         description_field = getattr(
@@ -69,12 +70,12 @@ class DynamicForm(BaseDynamicForm):
         # and put it in final_fields
         if current_user and not current_user.is_authenticated:
             captcha_data = {
-                "label": settings.TICKET_CAPTCHA_LABEL,
+                "label": TICKET_CAPTCHA_LABEL,
                 "captcha_name": dynamic_fields.format_field_name(
-                    settings.TICKET_CAPTCHA_ID
+                    TICKET_CAPTCHA_ID
                 ),
                 "captcha_hidden_name": dynamic_fields.format_field_name(
-                    settings.TICKET_CAPTCHA_HIDDEN_ID
+                    TICKET_CAPTCHA_HIDDEN_ID
                 ),
             }
             captcha_field = getattr(dynamic_fields, "CustomCaptchaComplexField")(

@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
 
 from organizational_area.models import OrganizationalStructure
+from uni_ticket.settings import READONLY_COMPETENCE_OVER_TICKET
 
 from .models import Ticket, TicketAssignment
 from .utils import (
@@ -234,7 +235,7 @@ def ticket_is_taken_for_employee(func_to_decorate):
         can_manage = original_kwargs["can_manage"]
         if can_manage["follow"] and can_manage["readonly"]:
             messages.add_message(
-                request, messages.ERROR, settings.READONLY_COMPETENCE_OVER_TICKET
+                request, messages.ERROR, READONLY_COMPETENCE_OVER_TICKET
             )
             return redirect(
                 "uni_ticket:manage_ticket_url_detail",

@@ -37,11 +37,6 @@ def encrypt_to_jwe(content):
 
 
 def decrypt_from_jwe(jwe):
-    # RSA_KEY = settings.UNITICKET_JWT_RSA_KEY_PATH
-    RSA_KEY = settings.UNITICKET_JWE_RSA_KEY_PATH
-    JWE_ALG = settings.UNITICKET_JWE_ALG
-    JWE_ENC = settings.UNITICKET_JWE_ENC
-
     priv_key = import_private_rsa_key_from_file(RSA_KEY)
     _decryptor = factory(jwe, alg=JWE_ALG, enc=JWE_ENC)
     _dkey = RSAKey(priv_key=priv_key)
