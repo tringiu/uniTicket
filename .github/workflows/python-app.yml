@@ -51,7 +51,7 @@ jobs:
       run: |
         DJANGO_SETTINGS_MODULE=tests.settings 
         coverage erase
-        coverage run ./manage.py test --settings=tests.settings
+        coverage run ./manage.py test --settings tests.settings --failfast -v 2
         coverage report -m
         coverage report --fail-under=80
         coverage xml
