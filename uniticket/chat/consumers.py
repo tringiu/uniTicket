@@ -131,7 +131,7 @@ class ChatConsumer(WebsocketConsumer):
     def join_room(self, event):
         user = get_user_model().objects.filter(pk=event['user']).first()
         if chat_operator(self.user, event['room']) or \
-           (user and event['user'] != self.user.pk and \
+           (user and event['user'] != self.user.pk and
            chat_operator(user, event['room'])):
             self.send(
                 text_data=json.dumps({

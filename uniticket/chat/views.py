@@ -36,10 +36,10 @@ def room(request, room_name):
                       })
 
     # if not chat_operator_online(request.user, structure.slug):
-            # return custom_message(request,
-                                  # _("Nessun operator online. "
-                                    # "Chat inaccessibile"),
-                                  # structure_slug=structure.slug)
+        # return custom_message(request,
+        # _("Nessun operator online. "
+        # "Chat inaccessibile"),
+        # structure_slug=structure.slug)
 
     categorie = TicketCategory.objects.filter(organizational_structure=structure,
                                               is_active=True)
@@ -73,5 +73,7 @@ def room(request, room_name):
                           structure_slug=structure.slug)
 
 # no login is required
+
+
 def random_vc_provider(request):
     return HttpResponse(random.choice(VIDEOCONF_PROVIDERS))

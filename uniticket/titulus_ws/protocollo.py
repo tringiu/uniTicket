@@ -46,7 +46,7 @@ class WSTitulusClient(object):
         # numero viene popolato a seguito di una protocollazione
         if kwargs.get('numero') and kwargs.get('anno'):
             self.numero = kwargs.get('numero')
-            self.anno   = kwargs.get('anno')
+            self.anno = kwargs.get('anno')
         else:
             self.numero = None
             self.anno = None
@@ -54,16 +54,14 @@ class WSTitulusClient(object):
         # attachments
         self.allegati = []
 
-
-
     def connect(self):
         """
         """
-        session=Session()
+        session = Session()
         settings = Settings(strict=False, xml_huge_tree=True)
         session.auth = HTTPBasicAuth(self.username,
                                      self.password)
-        transport=Transport(session=session)
+        transport = Transport(session=session)
         self.client = Client(self.wsdl_url,
                              transport=transport,
                              settings=settings)
@@ -113,8 +111,8 @@ class WSTitulusClient(object):
         return {'content': None,
                 'description': None,
                 'filename': None}
-                # force PDF
-                # 'mimeType': "application/pdf"}
+        # force PDF
+        # 'mimeType': "application/pdf"}
 
     def aggiungi_allegato(self,
                           fopen,

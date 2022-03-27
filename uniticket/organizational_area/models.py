@@ -101,7 +101,6 @@ class OrganizationalStructure(models.Model):
                                             user__in=default_office_users)
         return manager_users
 
-
     def __str__(self):
         if not self.structure_type:
             return self.name
@@ -153,7 +152,7 @@ class AbstractLocation(models.Model):
     funcionality = models.ManyToManyField(OrganizationalStructureFunction,
                                           blank=True)
     equipment = models.ManyToManyField(EquipmentType)
-    phone =  models.CharField(max_length=135, null=True,blank=True)
+    phone = models.CharField(max_length=135, null=True,blank=True)
     description_short = models.CharField(max_length=255, null=True,
                                          blank=True)
     description = models.TextField(max_length=1024, null=True,blank=True)

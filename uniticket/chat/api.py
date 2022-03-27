@@ -54,7 +54,7 @@ class ChatMessageModelViewSet(ModelViewSet):
             if channel:
                 channel.save(update_fields=['last_seen'])
         try:
-            if target and int(target)==request.user.pk:
+            if target and int(target) == request.user.pk:
                 self.queryset = self.queryset.filter(user=request.user,
                                                      broadcast=True)
             elif target:

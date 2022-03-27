@@ -7,6 +7,7 @@ from organizational_area.models import OrganizationalStructure
 
 register = template.Library()
 
+
 @register.simple_tag
 def structure_operator_online(current_user, structure_slug):
     return chat_operator_online(current_user, structure_slug)

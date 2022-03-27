@@ -10,7 +10,7 @@ router = DefaultRouter()
 router.register(r'message', ChatMessageModelViewSet, basename='message-api')
 router.register(r'user', UserModelViewSet, basename='user-api')
 
-app_name="chat"
+app_name = "chat"
 
 urlpatterns = [
     path(r'api/chat/', include(router.urls)),

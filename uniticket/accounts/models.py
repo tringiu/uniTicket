@@ -8,10 +8,10 @@ from django.conf import settings
 
 
 class User(AbstractUser):
-    GENDER= (
-                ( 'male', _('Maschio')),
-                ( 'female', _('Femmina')),
-                ( 'other', _('Altro')),
+    GENDER = (
+                ('male', _('Maschio')),
+                ('female', _('Femmina')),
+                ('other', _('Altro')),
             )
 
     is_active = models.BooleanField(_('attivo'), default=True)
@@ -21,16 +21,16 @@ class User(AbstractUser):
                                             blank=True, null=True,
                                             help_text="fonte CSA")
     matricola_studente = models.CharField(_('Matricola Studente'),
-                                            max_length=10,
-                                            blank=True, null=True,
-                                            help_text="fonte Esse3")
+                                          max_length=10,
+                                          blank=True, null=True,
+                                          help_text="fonte Esse3")
     first_name = models.CharField(_('Nome'), max_length=70,
                                   blank=True, null=True)
     last_name = models.CharField(_('Cognome'), max_length=70,
                                  blank=True, null=True)
     taxpayer_id = models.CharField(_('TaxPayer ID - codice fiscale'),
-                                      max_length=50,
-                                      blank=True, null=True)
+                                   max_length=50,
+                                   blank=True, null=True)
     email_notify = models.BooleanField(_('Notifiche mail'), default=True)
 
     class Meta:

@@ -47,6 +47,8 @@ class OrganizationalStructureOfficeEmployeeInline(admin.TabularInline):
     autocomplete_fields = ('employee',)
 
 # Structure Location
+
+
 class OrganizationalStructureOfficeLocationModelForm(forms.ModelForm):
 
     class Meta:

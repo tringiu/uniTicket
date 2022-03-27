@@ -5,6 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 from .admin_inlines import *
 
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     readonly_fields = ('date_joined', 'last_login',)
@@ -19,17 +20,17 @@ class CustomUserAdmin(UserAdmin):
                            )
                 }),
         (_('Angrafica'), {'fields': (('first_name', 'last_name'),
-                                         ('matricola_dipendente',
-                                          'matricola_studente'),
-                                         ('email', 'email_notify'),
-                                         ('taxpayer_id',),
-                                         # ('gender',
-                                          # 'place_of_birth', 'birth_date',),
+                                     ('matricola_dipendente',
+                                      'matricola_studente'),
+                                     ('email', 'email_notify'),
+                                     ('taxpayer_id',),
+                                     # ('gender',
+                                     # 'place_of_birth', 'birth_date',),
                                         )
                           }),
 
         # (_('Ruoli (impostazioni manuali)'), {'fields': ('is_operator', 'is_utente',)
-                          # }),
+        # }),
 
         (_('Permissions'), {'fields': ('groups', 'user_permissions'),
                             'classes':('collapse',)
@@ -46,6 +47,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('username', 'password1', 'password2'),
         }),
     )
+
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)

@@ -2,6 +2,7 @@ import re
 from archipro_ws.settings import (PROT_MAX_LABEL_LENGTH,
                                   PROT_UNALLOWED_CHARS)
 
+
 def clean_string(word, save_extension=False):
     # ignore bytes and int and all the other type different from str
     if not isinstance(word, str): return word
