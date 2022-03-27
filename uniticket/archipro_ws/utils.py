@@ -1,4 +1,3 @@
-import re
 from archipro_ws.settings import (PROT_MAX_LABEL_LENGTH,
                                   PROT_UNALLOWED_CHARS)
 

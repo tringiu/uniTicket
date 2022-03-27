@@ -2,11 +2,9 @@
 
 # SPDX-License-Identifier: GPL-3.0
 
-import datetime
 import io
 import os
 
-from django.conf import settings
 
 from zeep import Client
 

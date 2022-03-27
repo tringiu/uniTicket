@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext as _
 
-from django.conf import settings
 
 
 class User(AbstractUser):

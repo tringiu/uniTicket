@@ -1,13 +1,11 @@
 import json
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from channels.layers import get_channel_layer
 from datetime import timedelta
 
 from chat.settings import SECONDS_TO_KEEP_ALIVE

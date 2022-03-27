@@ -1,4 +1,3 @@
-from titulus_ws.settings import *
 
 
 def protocol_entrata_dict(**kwargs):

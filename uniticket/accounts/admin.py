@@ -1,9 +1,8 @@
 from django.contrib import admin
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin
 
 from .models import User
-from .admin_inlines import *
 
 
 @admin.register(User)

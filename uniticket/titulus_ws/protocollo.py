@@ -1,5 +1,3 @@
-import datetime
-import io
 import os
 import xml.etree.ElementTree as ET
 
@@ -88,7 +86,7 @@ class WSTitulusClient(object):
         ns0 = namespaces["ns0"]
         ns2 = namespaces["ns2"]
 
-        attachmentBean_type = self.client.get_type(f'{ns0}AttachmentBean')
+        self.client.get_type(f'{ns0}AttachmentBean')
         attachmentBeans_type = self.client.get_type(f'{ns2}ArrayOf_tns1_AttachmentBean')
         saveParams = self.client.get_type(f'{ns0}SaveParams')()
 

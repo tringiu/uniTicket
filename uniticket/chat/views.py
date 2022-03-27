@@ -16,8 +16,6 @@ from uni_ticket.utils import (custom_message,
                               user_is_in_organization,
                               user_is_in_default_office)
 
-from . utils import chat_operator_online
-from . views import *
 
 
 @login_required

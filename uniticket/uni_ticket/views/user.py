@@ -281,13 +281,6 @@ def ticket_new_preload(request, structure_slug=None):
     return render(request, template, d)
 
 
-def ticket_add_new(request, structure_slug, category_slug):
-    """
-        move all the code that may be shared between view and api view
-    """
-    pass
-
-
 class TicketAddNew(View):
 
     compiled_by_user = None
