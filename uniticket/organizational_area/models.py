@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext as _
 
-from . settings import *
+from . settings import DEFAULT_ORGANIZATIONAL_STRUCTURE_OFFICE, LOGOS_FOLDER, STRUCTURES_FOLDER
 
 STRUCTURES_FOLDER = getattr(settings, 'STRUCTURES_FOLDER', STRUCTURES_FOLDER)
 LOGOS_FOLDER = getattr(settings, 'LOGOS_FOLDER', LOGOS_FOLDER)
