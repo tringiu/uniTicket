@@ -506,7 +506,7 @@ class TicketAddNew(View):
         self.get_assets(structure_slug, category_slug)
         deny_response = self.deny_response()
         if deny_response:
-            return deny_response()
+            return deny_response
 
         # user that compiled ticket
         self.get_modulo_and_form()
