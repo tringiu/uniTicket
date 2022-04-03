@@ -1,12 +1,11 @@
-from django.urls import path, include, re_path
+from django.urls import path, re_path
 
-from api_rest.views import GroupViewSet, TicketAPIView, UserViewSet
+from api_rest.views import GroupViewSet, TicketAPIStruttureList, TicketAPITicketCategoryList, TicketAPIView, UserViewSet
 from rest_framework import routers
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
 
 
-import rest_framework.urls
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -17,12 +16,25 @@ router.register('groups', GroupViewSet)
 urlpatterns = [
   #path('api/', include(router.urls)),
   # path('api-auth/', include(rest_framework.urls, 'rest_framework',)),
-  
+
   path(
-    'api/<slug:structure_slug>/<slug:category_slug>/ticket/new', 
-    TicketAPIView.as_view(), 
+    'api/<slug:structure_slug>/<slug:category_slug>/ticket/new',
+    TicketAPIView.as_view(),
     name='api-new-ticket'
   ),
+
+  path(
+    'api/strutture/list',
+    TicketAPIStruttureList.as_view(),
+    name='api-strutture-list'
+  ),
+
+  path(
+    'api/ticket/category/list',
+    TicketAPITicketCategoryList.as_view(),
+    name='api-ticket-category-list'
+  ),
+
 
 ]
 

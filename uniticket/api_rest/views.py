@@ -6,19 +6,21 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core import serializers
 from django.core.exceptions import BadRequest
-from django.utils.translation import gettext as _
 
 from rest_framework.exceptions import PermissionDenied
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import permissions, viewsets
 
 from uni_ticket.dynamic_form import serialize_form
+from uni_ticket.models import TicketCategory
 from uni_ticket.views.user import TicketAddNew
 from uni_ticket.settings import TICKET_CREATE_BUTTON_NAME
+from organizational_area.models import OrganizationalStructure
 
 
-from . serializers import GroupSerializer, UserSerializer
+from . serializers import GroupSerializer, TicketCategorySerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -50,14 +52,10 @@ class TicketAPIBaseView(APIView):
     """
 
     # TODO: AgID MoDI or custom token to authenticate(request) on the http authz header
-    
+
     # authentication_classes = [authentication.TokenAuthentication]
     # permission_classes = [permissions.IsAdminUser]
 
-    def dispatch(self, request, *args, **kwargs):
-        self.legacy_view = TicketAddNew()
-        self.legacy_view.request = request
-        return super().dispatch(request, *args, **kwargs)
 
 
 class TicketAPIView(TicketAPIBaseView):
@@ -105,6 +103,11 @@ class TicketAPIView(TicketAPIBaseView):
             )
         )
 
+    def dispatch(self, request, *args, **kwargs):
+        self.legacy_view = TicketAddNew()
+        self.legacy_view.request = request
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, structure_slug, category_slug):
         """
         Return a ticket by structure_slug, category_slug
@@ -112,7 +115,7 @@ class TicketAPIView(TicketAPIBaseView):
         legacy_response = self.legacy_view.get(request, structure_slug, category_slug)
         if legacy_response.status_code == 302:
             raise PermissionDenied(
-                {   
+                {
                     "redirect_url": legacy_response.url,
                     "messages": self.get_messages()
                 }
@@ -138,7 +141,7 @@ class TicketAPIView(TicketAPIBaseView):
             _res = self.build_response()
             _res['compiled_form'] = self.legacy_view.form.cleaned_data
             _res['status'] = {
-                k: getattr(self.legacy_view.ticket, k) 
+                k: getattr(self.legacy_view.ticket, k)
                 for k in ("code", "created", "is_closed", "protocol_number", "protocol_date")
             }
             _res['status']["created_by"] = self.legacy_view.ticket.created_by.__str__()
@@ -147,3 +150,21 @@ class TicketAPIView(TicketAPIBaseView):
 
         else:
             raise BadRequest()
+
+
+class TicketAPIStruttureList(TicketAPIBaseView):
+
+    def get(self, request):
+        return Response(
+            json.loads(
+                    serializers.serialize(
+                        'json', OrganizationalStructure.objects.filter(is_active=True)
+                    )
+            )
+        )
+
+
+class TicketAPITicketCategoryList(generics.ListAPIView):
+    queryset = TicketCategory.objects.filter(is_active=True)
+    lookup_field = 'pk'
+    serializer_class = TicketCategorySerializer

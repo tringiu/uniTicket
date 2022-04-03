@@ -105,27 +105,27 @@ class DynamicForm(BaseDynamicForm):
 
 
 def _get_choices(choices):
-        elements = []
-        for choice in choices:
-            if (type(choice[1]) == tuple):
-                elements.extend(_get_choices(choice[1]))
-            else:
-                elements.append(
-                    {"text": choice[1],
-                     "value": choice[0]}
-                )
-        return elements
+    elements = []
+    for choice in choices:
+        if (type(choice[1]) == tuple):
+            elements.extend(_get_choices(choice[1]))
+        else:
+            elements.append(
+                {"text": choice[1],
+                 "value": choice[0]}
+            )
+    return elements
 
 
 def serialize_form(form, api_source = 'api_source'):
-    
+
     form_fields = []
-    
+
     for field_name in form.fields:
         field = form.fields[field_name]
         field_type = getattr(field.widget.__class__,
-                                'input_type',
-                                'textarea')
+                             'input_type',
+                             'textarea')
 
         field_dict = {}
         field_dict['id'] = field_name
@@ -154,7 +154,7 @@ def serialize_form(form, api_source = 'api_source'):
             if hasattr(field, '_queryset') and not getattr(field, api_source, ''):
                 for item in field._queryset:
                     field_dict['options'].append({"text": item.__str__(),
-                                                    "value": item.pk})
+                                                  "value": item.pk})
             elif hasattr(field, '_choices'):
                 field_dict['options'].extend(_get_choices(field._choices))
         else:

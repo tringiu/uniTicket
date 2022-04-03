@@ -195,6 +195,7 @@ def _send_new_ticket_mail_to_operators(
         "".format(timezone.localtime(), result, ticket)
     )
 
+
 def get_structures_by_request(request, structure_slug):
     try:
         structure = get_object_or_404(
@@ -248,6 +249,7 @@ def get_structures_by_request(request, structure_slug):
         "chosen_structure": structure,
         "sub_title": sub_title,
     }
+
 
 @login_required
 def ticket_new_preload(request, structure_slug=None):
@@ -541,7 +543,7 @@ class TicketAddNew(View):
             "sub_title": "{} - {}".format(self.struttura, self.sub_title),
             "title": self.title,
         }
-        
+
         self.form = self.modulo.get_form(
             data=request.POST or request.api_data, # csrf except workaround for API integration
             files=request.FILES,
@@ -549,7 +551,7 @@ class TicketAddNew(View):
             current_user=request.user,
         )
         self.context_data["form"] = self.form
-        
+
         if self.form.is_valid():
             # add static static fields to fields to pop
             # these fields are useful only in frontend
@@ -778,7 +780,7 @@ class TicketAddNew(View):
                 # end Protocol
 
                 messages.add_message(request, messages.SUCCESS, compiled_message)
-                
+
                 # if office operators must receive notification email
                 if self.category.receive_email:
                     # Send mail to ticket
