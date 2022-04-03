@@ -1179,7 +1179,7 @@ class TicketDetail(View):
     """
     template = "user/ticket_detail.html"
 
-    def get(self, request, ticket_id:str):
+    def get(self, request, ticket_id:str, api:bool=False):
 
         ticket = get_object_or_404(Ticket, code=ticket_id)
         modulo_compilato = ticket.get_modulo_compilato()
@@ -1207,7 +1207,8 @@ class TicketDetail(View):
             is_printable=True
         )
 
-        d = {
+        self.data = {
+            "title": title,
             "allegati": allegati,
             "category_conditions": category_conditions,
             "dependences": ticket_dependences,
@@ -1220,9 +1221,11 @@ class TicketDetail(View):
             "ticket_form": ticket_form,
             "logs": ticket_logs,
             "ticket_task": ticket_task,
-            "title": title,
         }
-        return render(request, self.template, d)
+        if api:
+            return self.data
+        else:
+            return render(request, self.template, self.data)
 
 
 @login_required

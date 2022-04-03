@@ -789,7 +789,6 @@ urlpatterns += [
 
 # User URLs
 tickets = "tickets"
-# ticket = '{}'.format(tickets)
 ticket_id = "{}/<str:ticket_id>".format(tickets)
 
 urlpatterns += [

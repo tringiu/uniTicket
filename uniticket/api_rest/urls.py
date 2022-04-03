@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from api_rest.views import GroupViewSet, TicketAPIStruttureList, TicketAPITicketCategoryList, TicketAPIView, UserViewSet
+from api_rest.views import GroupViewSet, TicketAPIDetail, TicketAPIStruttureList, TicketAPITicketCategoryList, TicketAPIView, UserViewSet
 from rest_framework import routers
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
@@ -34,6 +34,12 @@ urlpatterns = [
     'api/<slug:structure_slug>/<slug:category_slug>/ticket/new',
     TicketAPIView.as_view(),
     name='api-new-ticket'
+  ),
+
+  path(
+    'api/ticket/<str:ticket_uid>',
+    TicketAPIDetail.as_view(),
+    name='api-view-ticket'
   ),
 
   path(
