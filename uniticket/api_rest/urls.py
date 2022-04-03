@@ -17,6 +17,19 @@ urlpatterns = [
   #path('api/', include(router.urls)),
   # path('api-auth/', include(rest_framework.urls, 'rest_framework',)),
 
+  re_path(
+    '^openapi$',
+    get_schema_view(**{}),
+    name='openapi-schema'
+  ),
+  re_path(
+    '^openapi.json$',
+    get_schema_view(
+      renderer_classes = [JSONOpenAPIRenderer], **{}
+    ),
+    name='openapi-schema-json'
+  ),
+
   path(
     'api/<slug:structure_slug>/<slug:category_slug>/ticket/new',
     TicketAPIView.as_view(),
@@ -37,18 +50,3 @@ urlpatterns = [
 
 
 ]
-
-
-urlpatterns += re_path(
-  '^openapi$',
-  get_schema_view(**{}),
-  name='openapi-schema'
-),
-
-urlpatterns += re_path(
-  '^openapi.json$',
-  get_schema_view(
-    renderer_classes = [JSONOpenAPIRenderer], **{}
-  ),
-  name='openapi-schema-json'
-),
