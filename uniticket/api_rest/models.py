@@ -47,6 +47,7 @@ class AuthorizationToken(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = "api_rest"
         ordering = ['name']
         verbose_name = _("Authorization Token")
         verbose_name_plural = _("Authorization Tokens")

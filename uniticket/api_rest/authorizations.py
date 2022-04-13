@@ -7,7 +7,7 @@ from rest_framework.authentication import (
     get_authorization_header
 )
 from rest_framework.exceptions import AuthenticationFailed
-from . models import AuthorizationToken
+from api_rest.models import AuthorizationToken
 
 logger = logging.getLogger('__name__')
 
