@@ -59,5 +59,9 @@ class AuthorizationToken(models.Model):
         except TypeError:
             return False
 
+    @property
+    def as_http_header(self):
+        return {"HTTP_AUTHORIZATION": f"Token {self.value}"}
+
     def __str__(self):
         return f"{self.name} [{self.user}]"

@@ -21,11 +21,11 @@ class AuthorizationToken(TokenAuthentication):
         auth = get_authorization_header(request).split()
         if not auth:
             return None
-        return super(self.model, self).authenticate(request)
+        return super().authenticate(request)
     
     def authenticate_credentials(self, token):
         try:
-            token = self.model.objects.select_related('user').get(access_token=token)
+            token = self.model.objects.select_related('user').get(value=token)
         except self.model.DoesNotExist: # pragma: no cover
             logger.warning(AuthenticationFailed(_('Invalid token.')))
             return None
@@ -37,3 +37,5 @@ class AuthorizationToken(TokenAuthentication):
         if not token.is_active: # pragma: no cover
             logger.warning(AuthenticationFailed(_('Token expired.')))
             return None
+
+        return (token.user, token)
