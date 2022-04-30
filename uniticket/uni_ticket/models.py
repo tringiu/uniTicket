@@ -450,7 +450,8 @@ class Ticket(SavedFormContent):
     # protocol
     protocol_number = models.CharField(blank=True, default="", max_length=32)
     protocol_date = models.DateTimeField(
-        help_text=_("Quando la richiesta è stato protocollata"), blank=True, null=True
+        help_text=_("Quando la richiesta è stata protocollata"),
+        blank=True, null=True
     )
 
     class Meta:
